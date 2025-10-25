@@ -1,1 +1,1 @@
-web: python manage.py migrate && python create_superuser.py && python manage.py collectstatic --noinput && python manage.py runserver 0.0.0.0:$PORT
+web: python manage.py migrate --noinput; python create_superuser.py; python manage.py runserver 0.0.0.0:$PORT

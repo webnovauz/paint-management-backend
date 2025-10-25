@@ -207,3 +207,23 @@ LOGGING = {
         },
     },
 }
+
+# Railway production settings
+if 'RAILWAY_ENVIRONMENT' in os.environ:
+    # Продакшен настройки для Railway
+    DEBUG = False
+    
+    # Логирование для продакшена
+    LOGGING['root']['level'] = 'INFO'
+    LOGGING['loggers']['django']['level'] = 'INFO'
+    
+    # Безопасность
+    SECURE_SSL_REDIRECT = False  # Railway handles SSL
+    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+    
+    print("🚀 Running in Railway production mode")
+else:
+    print("🔧 Running in development mode")
+
+# Static files for Railway
+STATIC_ROOT = BASE_DIR / 'staticfiles'

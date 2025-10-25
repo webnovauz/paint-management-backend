@@ -21,12 +21,34 @@ from django.conf.urls.static import static
 from django.http import JsonResponse
 
 def health_check(request):
-    """Simple health check endpoint for Railway"""
-    return JsonResponse({'status': 'healthy', 'service': 'paint-management-backend'})
+    """Simple health check endpoint for Railway - no DB required"""
+    return JsonResponse({
+        'status': 'healthy', 
+        'service': 'paint-management-backend',
+        'timestamp': str(request.META.get('HTTP_DATE', 'unknown'))
+    })
+
+def db_check(request):
+    """Database health check endpoint"""
+    try:
+        from django.db import connection
+        with connection.cursor() as cursor:
+            cursor.execute("SELECT 1")
+        return JsonResponse({
+            'status': 'healthy', 
+            'database': 'connected'
+        })
+    except Exception as e:
+        return JsonResponse({
+            'status': 'error',
+            'database': 'disconnected', 
+            'error': str(e)
+        }, status=500)
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('health/', health_check, name='health_check'),  # Health check для Railway
+    path('health/', health_check, name='health_check'),  # Simple health check
+    path('health/db/', db_check, name='db_check'),  # Database health check
     path('', include('paints.urls')),
 ]
 
